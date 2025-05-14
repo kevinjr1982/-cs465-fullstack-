@@ -59,6 +59,7 @@ typings/
 
 # next.js build output
 .next
+<<<<<<< HEAD
 
 # Filter out VScode Working Files
 .vscode/*
@@ -67,3 +68,5 @@ typings/
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+=======
+>>>>>>> 7e77db4a9f258716df05b6747ca57df4c5e756c8
