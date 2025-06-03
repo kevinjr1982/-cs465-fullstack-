@@ -8,23 +8,12 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.5.0",
     "express": "^4.21.2",
+    "handlebars": "^4.7.8",
     "hbs": "^4.2.0",
     "http-errors": "~1.6.3",
+    "mongoose": "^8.15.1",
     "morgan": "~1.9.1"
-  },
-  "main": "app.js",
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kevinjr1982/-cs465-fullstack-.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kevinjr1982/-cs465-fullstack-/issues"
-  },
-  "homepage": "https://github.com/kevinjr1982/-cs465-fullstack-#readme",
-  "description": ""
+  }
 }

@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var controller = require('../controllers/travlr').default;
+const controller = require('../controllers/travel');
 
-/* GET travel page. */
-router.exports = router;
+/* GET home page. */
+// router.get('/', function(req, res, next) {
+//   res.render('index', { title: 'Express' });
+// });
+
+router.get('/', controller.travel);
+
 
 module.exports = router;
-
-module.exports.travlr = (req, res) => {
-    res.render('index', { title: 'Travlr' }); // new code
-};

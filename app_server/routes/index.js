@@ -1,9 +1,13 @@
-const express = require('express');
-const router = express.Router();
-//const travlrController = require('../controllers/travel').default; // Ensure the path is correct
-const travlrController = require('../controllers/travlr');
+var express = require('express');
+var router = express.Router();
+const controller = require('../controllers/main');
 
+/* GET home page. */
+// router.get('/', function(req, res, next) {
+//   res.render('index', { title: 'Express' });
+// });
 
-router.get('travel', travlrController.travlr); //Ensure 'travlr' is correctly referenced
+router.get('/', controller.index);
+
 
 module.exports = router;
