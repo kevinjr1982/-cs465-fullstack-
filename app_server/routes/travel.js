@@ -1,13 +1,16 @@
-var express = require('express');
-var router = express.Router();
-const controller = require('../controllers/travel');
+// app_server/routes/travel.js
 
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express' });
-// });
+const express = require("express");
+const router = express.Router();
 
-router.get('/', controller.travel);
+// Note: Adjust the path below if your controllers folder is elsewhere!
+const travelController = require("../controllers/travel");
 
+// When the URL is '/travel', call travelController.travel.
+router.get("/", travelController.travel);
+
+// When the URL is '/travel/:tripCode', call travelController.travelDetail.
+router.get("/:tripCode", travelController.travelDetail);
 
 module.exports = router;
+

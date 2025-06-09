@@ -1,13 +1,11 @@
-var express = require('express');
-var router = express.Router();
-const controller = require('../controllers/main');
+const express = require("express");
+const router = express.Router();
+const travelController = require("../controllers/travel");
 
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express' });
-// });
+// Route to render the travel view with all trips.
+router.get("/travel", travelController.travel);
 
-router.get('/', controller.index);
-
+// Route to render a detail view of a single trip using its trip code.
+router.get("/travel/:tripCode", travelController.travelDetail);
 
 module.exports = router;
