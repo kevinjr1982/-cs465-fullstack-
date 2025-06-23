@@ -1,0 +1,642 @@
+{
+  "info": {
+    "name": "Travlr API Complete Testing Collection",
+    "description": "Comprehensive API testing collection for Travlr Angular SPA with all CRUD operations and authentication",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trip_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', jsonData.token);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData.user).to.have.property('email');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@travlr.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with admin credentials to get JWT token"
+          }
+        },
+        {
+          "name": "Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or 409\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Response has token\", function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('token');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trip Management - Public",
+      "item": [
+        {
+          "name": "Get All Trips (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Trips have required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        var trip = jsonData[0];",
+                  "        pm.expect(trip).to.have.property('_id');",
+                  "        pm.expect(trip).to.have.property('code');",
+                  "        pm.expect(trip).to.have.property('name');",
+                  "        pm.expect(trip).to.have.property('length');",
+                  "        pm.expect(trip).to.have.property('start');",
+                  "        pm.expect(trip).to.have.property('resort');",
+                  "        pm.expect(trip).to.have.property('perPerson');",
+                  "        pm.expect(trip).to.have.property('image');",
+                  "        pm.expect(trip).to.have.property('description');",
+                  "        ",
+                  "        // Store first trip ID for later use",
+                  "        pm.collectionVariables.set('trip_id', trip._id);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/trips",
+              "host": ["{{base_url}}"],
+              "path": ["trips"]
+            },
+            "description": "Get all trips - public endpoint, no authentication required"
+          }
+        },
+        {
+          "name": "Get Single Trip (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has trip data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/trips/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["trips", "{{trip_id}}"]
+            },
+            "description": "Get a single trip by ID - public endpoint"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trip Management - Admin (Protected)",
+      "item": [
+        {
+          "name": "Create New Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has created trip\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "    pm.expect(jsonData.code).to.eql('TEST001');",
+                  "    ",
+                  "    // Store new trip ID for later use",
+                  "    pm.collectionVariables.set('new_trip_id', jsonData._id);",
+                  "});",
+                  "",
+                  "pm.test(\"Trip has audit fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('createdBy');",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TEST001\",\n  \"name\": \"Test Adventure\",\n  \"length\": \"3 days / 2 nights\",\n  \"start\": \"2024-07-01\",\n  \"resort\": \"Test Resort, 4 stars\",\n  \"perPerson\": \"$999.00\",\n  \"image\": \"https://via.placeholder.com/400x250?text=Test+Trip\",\n  \"description\": \"This is a test trip created via Postman to verify the CREATE operation is working correctly.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips",
+              "host": ["{{base_url}}"],
+              "path": ["trips"]
+            },
+            "description": "Create a new trip - requires authentication"
+          }
+        },
+        {
+          "name": "Update Trip (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Trip was updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.name).to.eql('Updated Test Adventure');",
+                  "    pm.expect(jsonData.perPerson).to.eql('$1299.00');",
+                  "});",
+                  "",
+                  "pm.test(\"Has updated audit fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('updatedBy');",
+                  "    pm.expect(jsonData).to.have.property('updatedAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TEST001\",\n  \"name\": \"Updated Test Adventure\",\n  \"length\": \"4 days / 3 nights\",\n  \"start\": \"2024-07-01\",\n  \"resort\": \"Updated Test Resort, 5 stars\",\n  \"perPerson\": \"$1299.00\",\n  \"image\": \"https://via.placeholder.com/400x250?text=Updated+Test+Trip\",\n  \"description\": \"This trip has been updated via Postman to verify the UPDATE operation is working correctly.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips/{{new_trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["trips", "{{new_trip_id}}"]
+            },
+            "description": "Update an existing trip - requires authentication"
+          }
+        },
+        {
+          "name": "Partial Update Trip (PATCH)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Only specified fields updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.perPerson).to.eql('$1499.00');",
+                  "    pm.expect(jsonData.name).to.eql('Updated Test Adventure');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"perPerson\": \"$1499.00\",\n  \"description\": \"Price updated via PATCH operation to test partial updates.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips/{{new_trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["trips", "{{new_trip_id}}"]
+            },
+            "description": "Partially update a trip - requires authentication"
+          }
+        },
+        {
+          "name": "Delete Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion confirmed\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/trips/{{new_trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["trips", "{{new_trip_id}}"]
+            },
+            "description": "Delete a trip - requires authentication"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Handling Tests",
+      "item": [
+        {
+          "name": "Unauthorized Access Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"UNAUTH001\",\n  \"name\": \"Unauthorized Test\",\n  \"length\": \"1 day\",\n  \"start\": \"2024-01-01\",\n  \"resort\": \"Test\",\n  \"perPerson\": \"$100.00\",\n  \"image\": \"test.jpg\",\n  \"description\": \"This should fail\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips",
+              "host": ["{{base_url}}"],
+              "path": ["trips"]
+            },
+            "description": "Test unauthorized access to protected endpoint"
+          }
+        },
+        {
+          "name": "Invalid Login Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invalid@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Test login with invalid credentials"
+          }
+        },
+        {
+          "name": "Trip Not Found Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/trips/507f1f77bcf86cd799439011",
+              "host": ["{{base_url}}"],
+              "path": ["trips", "507f1f77bcf86cd799439011"]
+            },
+            "description": "Test accessing non-existent trip"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Data Validation Tests",
+      "item": [
+        {
+          "name": "Create Trip - Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Validation error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"INVALID001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips",
+              "host": ["{{base_url}}"],
+              "path": ["trips"]
+            },
+            "description": "Test creating trip with missing required fields"
+          }
+        },
+        {
+          "name": "Create Trip - Duplicate Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 or 409\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 409]);",
+                  "});",
+                  "",
+                  "pm.test(\"Duplicate error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"GALR210214\",\n  \"name\": \"Duplicate Test\",\n  \"length\": \"1 day\",\n  \"start\": \"2024-01-01\",\n  \"resort\": \"Test Resort\",\n  \"perPerson\": \"$100.00\",\n  \"image\": \"test.jpg\",\n  \"description\": \"This should fail due to duplicate code\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trips",
+              "host": ["{{base_url}}"],
+              "path": ["trips"]
+            },
+            "description": "Test creating trip with duplicate code"
+          }
+        }
+      ]
+    }
+  ]
+}
+

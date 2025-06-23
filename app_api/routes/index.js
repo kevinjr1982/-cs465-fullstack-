@@ -2,10 +2,25 @@
 const express = require("express");
 const router = express.Router();
 
-// Mount the trips router on the '/trips' path.
+// Import route modules
 const tripsRouter = require("./trips");
-router.use("/trips", tripsRouter);
+const authRouter = require("./auth");
 
-// You can add additional routes or routers as needed.
+// Mount routes
+router.use("/trips", tripsRouter);
+router.use("/auth", authRouter);
+
+// API health check
+router.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Travlr API is running",
+    version: "1.0.0",
+    endpoints: {
+      trips: "/api/trips",
+      auth: "/api/auth"
+    }
+  });
+});
 
 module.exports = router;
+
